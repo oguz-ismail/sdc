@@ -34,6 +34,7 @@ fatal() {
 } >&2
 
 nonfatal() {
+	status=1
 	printf '%s: %s (#%d): ' "$0" "$token" $addr
 	case $1 in
 	(1)
@@ -120,6 +121,8 @@ call=h format=0
 if parseopt "$1"; then
 	shift
 fi
+
+status=0
 
 addr=-2
 rmark=0
@@ -394,10 +397,6 @@ for token in . k0 "$@"; do
 	set -- "$value" "$@"
 done
 
-if test $# -lt 1; then
-	exit
-fi
-
 case $call in
 (d)
 	bc | paste -d '\0' - - - - - ;;
@@ -627,7 +626,13 @@ define s(t, s) {
 	"
 "
 }
-$(printf '\nu = p(%s)' "$@")
+$(
+if test $# -ge 1; then
+	printf '\nu = p(%s)' "$@"
+fi
+)
 eof
+
+exit $status
 
 # vim: ft=sh
