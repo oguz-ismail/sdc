@@ -34,7 +34,14 @@ fatal() {
 } >&2
 
 nonfatal() {
-	status=1
+	case $status in
+	(4)
+		status=5 ;;
+	(5)
+		;;
+	(*)
+		status=4
+	esac
 	printf '%s: %s (#%d): ' "$0" "$token" $addr
 	case $1 in
 	(1)
@@ -397,6 +404,9 @@ for token in . k0 "$@"; do
 	set -- "$value" "$@"
 done
 
+# TAG: POSIX.1-202x
+# set -o pipefail
+
 case $call in
 (d)
 	bc | paste -d '\0' - - - - - ;;
@@ -588,6 +598,8 @@ define s(t, s) {
 				"0"
 			}
 		}
+		/* Not all bc implementations
+		 * print the leading zero. */
 		if (t > 0) {
 		if (t < 1) {
 			"0."
@@ -632,6 +644,10 @@ if test $# -ge 1; then
 fi
 )
 eof
+
+if test $? -ne 0; then
+	status=3
+fi
 
 exit $status
 
