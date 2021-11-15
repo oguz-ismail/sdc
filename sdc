@@ -132,7 +132,7 @@ fi
 status=0
 
 addr=-2
-rmark=0
+smark=0
 arity=0
 
 for token in . k0 "$@"; do
@@ -161,20 +161,54 @@ for token in . k0 "$@"; do
 		if popmark; then
 			case $token in
 			(J)
-				rmark=$pmark
+				smark=$pmark
 			esac
 		else
 			nonfatal 3
 		fi
 		continue ;;
 	(s)
-		if test $rmark -ge $#; then
+		if test $smark -ge $#; then
 			pushmark $#
-		elif test $rmark -ge $mark; then
-			pushmark $rmark
+		elif test $smark -ge $mark; then
+			pushmark $smark
 		else
 			nonfatal 4
 		fi
+		continue ;;
+	([QWqw]?*)
+		if ! popmark; then
+			nonfatal 3
+			continue
+		fi
+		case $token in
+		(Q0|W0|?0?*|?*[!0-9]*)
+			fatal 1
+		esac
+		count=${token#?}
+		case $token in
+		(q*)
+			origin=$# ;;
+		([QW]*)
+			origin=$pmark ;;
+		(w*)
+			origin=$mark
+		esac
+		case $token in
+		([Qq]*)
+			if test $count -ge $origin; then
+				umark=0
+			else
+				umark=$((origin - count))
+			fi
+			resetmark $umark ;;
+		([Ww]*)
+			umark=$((origin + count))
+			if test $umark -gt $#; then
+				umark=$#
+			fi
+		esac
+		pushmark $umark
 		continue ;;
 	# commands for controlling the stack
 	(n)
