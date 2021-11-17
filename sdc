@@ -45,13 +45,13 @@ nonfatal() {
 	printf '%s: %s (#%d): ' "$0" "$token" $addr
 	case $1 in
 	(1)
-		printf 'fewer elements on the stack than required' ;;
+		printf 'fewer elements on the stack than specified' ;;
 	(2)
 		printf 'fewer elements on the region than specified' ;;
 	(3)
-		printf 'TODO' ;;
+		printf 'fewer regions on the stack than expected' ;;
 	(4)
-		printf 'TODO'
+		printf 'regions overlap'
 	esac
 	printf '\n'
 } >&2
@@ -138,7 +138,7 @@ arity=0
 for token in . k0 "$@"; do
 	addr=$((addr + 1))
 
-	# meta-commands
+	# meta-commands, aliases
 	case $token in
 	(i)
 		token=
