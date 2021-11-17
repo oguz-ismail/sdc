@@ -231,18 +231,10 @@ for token in . k0 "$@"; do
 			set -- "$1" "$@"
 		done
 		continue ;;
-	(f*|F|u)
+	(f*|F)
 		case $token in
 		(F)
 			bound=$mark ;;
-		(u)
-			if popmark; then
-				bound=$mark
-				pushmark $((bound + ($# - pmark)))
-			else
-				nonfatal 3
-				continue
-			fi ;;
 		(*)
 			case $token in
 			(?)
@@ -262,12 +254,29 @@ for token in . k0 "$@"; do
 				pushmark $((bound + ($# - pmark)))
 			done
 		esac
-		rlist=
+		flist=
 		while test $# -gt $bound; do
-			rlist="'$1' $rlist"
+			flist="'$1' $flist"
 			shift
 		done
-		eval "set -- $rlist \"\$@\""
+		eval "set -- $flist \"\$@\""
+		continue ;;
+	(z)
+		if ! popmark; then
+			nonfatal 3
+			continue
+		fi
+		rlist= llist=
+		while test $# -gt $pmark; do
+			rlist="$rlist'$1' "
+			shift
+		done
+		while test $# -gt $mark; do
+			llist="$llist'$1' "
+			shift
+		done
+		eval "set -- $llist $rlist \"\$@\""
+		pushmark $((mark + ($# - pmark)))
 		continue ;;
 	(p*)
 		case $token in
