@@ -18,9 +18,6 @@ export POSIXLY_CORRECT=
 unset BC_ENV_ARGS
 unset BC_LINE_LENGTH
 
-r1=0 r2=0 r3=0 r4=0
-r5=0 r6=0 r7=0 r8=0
-
 fatal() {
 	printf '%s: ' "$0"
 	case $1 in
@@ -119,21 +116,24 @@ evalfield() {
 	fi
 }
 
-case $SDC_INTL_SCALE in
+case ${SDC_INTL_SCALE-} in
 (''|*[!0-9]*)
 	SDC_INTL_SCALE=20
 esac
 
+status=0
+
 call=h format=0
-if parseopt "$1"; then
+if parseopt "${1-}"; then
 	shift
 fi
-
-status=0
 
 addr=-2
 smark=0
 arity=0
+
+r1=0 r2=0 r3=0 r4=0
+r5=0 r6=0 r7=0 r8=0
 
 for token in . k0 "$@"; do
 	addr=$((addr + 1))
