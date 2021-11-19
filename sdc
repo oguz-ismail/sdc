@@ -187,26 +187,26 @@ for token in . k0 "$@"; do
 		esac
 		count=${token#?}
 		case $token in
-		(q*)
-			origin=$# ;;
 		([QW]*)
 			origin=$pmark ;;
+		(q*)
+			origin=$mark ;;
 		(w*)
-			origin=$mark
+			origin=$#
 		esac
 		case $token in
 		([Qq]*)
+			umark=$((origin + count))
+			if test $umark -gt $#; then
+				umark=$#
+			fi ;;
+		([Ww]*)
 			if test $count -ge $origin; then
 				umark=0
 			else
 				umark=$((origin - count))
 			fi
-			resetmark $umark ;;
-		([Ww]*)
-			umark=$((origin + count))
-			if test $umark -gt $#; then
-				umark=$#
-			fi
+			resetmark $umark
 		esac
 		pushmark $umark
 		continue ;;
